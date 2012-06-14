@@ -20,6 +20,10 @@
 	All test code. Do not use unless you know what you are doing!!
 	------------
 	CMDS: check, register, update, transfer, delete, assist
+	
+	Update 2012-06-14
+	- Code fixes
+	- Example code now supplied (register, check)
 */
 #include <sqlite3.h>
 #include <stdio.h>
@@ -100,7 +104,8 @@ int main(void)
 				notify(255);
 			}
 			return 0;
-		} else if(!strcmp(cmd, "record"))
+		}
+		if(!strcmp(cmd, "register"))
 		{
 			user=cgiGetValue(cgi, "user");
 			userkey=cgiGetValue(cgi, "userkey");
@@ -118,19 +123,29 @@ int main(void)
 				notify(255);
 			}
 			return 0;
-		} else if(!strcmp(cmd, "assist"))
+		}
+		if(!strcmp(cmd, "assist"))
 		{
 			/* request for assistance. this will go directly to the TLD manager */
 			user=cgiGetValue(cgi, "user");
 			userkey=cgiGetValue(cgi, "userkey");
 			tld=cgiGetValue(cgi, "tld");
-			if(verify(user, key))
+			if(verify(user, userkey))
 			{
 				rc=get_support(tld);
 				notify(rc);
 			} else {
 				notify(255);
 			}
+		}
+		if(!strcmp(cmd, "update"))
+		{
+		}
+		if(!strcmp(cmd, "transfer"))
+		{
+		}
+		if(!strcmp(cmd, "delete"))
+		{
 		}
 	} else {
 		printf("Content-type: text/html\n\n");
