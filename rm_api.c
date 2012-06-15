@@ -75,6 +75,21 @@ int get_support(char tld[5])
 {
 }
 
+int update_domain(char domain[50], char name[20], char email[50], char ns1[50], char ns2[50])
+{
+	return 1;
+}
+
+int transfer_domain(char user[20], char userkey[16], char newuser[20], char newuserkey[16], char domain[50])
+{
+	return 1;
+}
+
+int delete_domain(char domain[50], char name[20], char email[50])
+{
+	return 1;
+}
+
 int main(void)
 {
 	char *cmd;
@@ -86,6 +101,8 @@ int main(void)
 	char *ns1;
 	char *ns2;
 	char *tld;
+	char *olduser;
+	char *olduserkey;
 	int rc=0;
 	cgi = cgiInit();
 
@@ -140,12 +157,52 @@ int main(void)
 		}
 		if(!strcmp(cmd, "update"))
 		{
+			user=cgiGetValue(cgi, "user");
+			userkey=cgiGetValue(cgi, "userkey");
+			domain=cgiGetValue(cgi, "domain");
+			name=cgiGetValue(cgi, "name");
+			email=cgiGetValue(cgi, "email");
+			ns1=cgiGetValue(cgi, "ns1");
+			ns2=cgiGetValue(cgi, "ns2");
+			if(verify(user, userkey))
+			{
+				rc=update_domain(domain, name, email, ns1, ns2);
+				notify(rc);
+			} else {
+				notify(255);
+			}
+			return 0;
 		}
 		if(!strcmp(cmd, "transfer"))
 		{
+			user=cgiGetValue(cgi, "user");
+			userkey=cgiGetValue(cgi, "userkey");
+			olduser=cgiGetValue(cgi, "olduser");
+			olduserkey=cgiGetValue(cgi, "olduserkey");
+			domain=cgiGetValue(cgi, "domain");
+			if(verify(user, userkey))
+			{
+				rc=transfer_domain(user, userkey, olduser, olduserkey, domain);
+				notify(rc);
+			} else {
+				notify(255);
+			}
+			return 0;
 		}
 		if(!strcmp(cmd, "delete"))
 		{
+			user=cgiGetValue(cgi, "user");
+			userkey=cgiGetValue(cgi, "userkey");
+			domain=cgiGetValue(cgi, "domain");
+			name=cgiGetValue(cgi, "name");
+			if(verify(user, userkey))
+			{
+				rc=delete_domain(domain, name, email);
+				notify(rc);
+			} else {
+				notify(255);
+			}
+			return 0;
 		}
 	} else {
 		printf("Content-type: text/html\n\n");
