@@ -1,2 +1,11 @@
+Version v0.5 - 2012-07-01
+- Embeds SQLite3
+- Improved handling of TLD
+- Supports multiple TLDs
+- Actually works now :)
+- Changed database name
+- Changed to GPL v3 license.
+- Transfer, delete and assist temporarily disabled.
+
 v0.01 2012-06-10 - MC
 - Just some toy code. A lot of TODO, with two practical commands demonstrated: check, and record.

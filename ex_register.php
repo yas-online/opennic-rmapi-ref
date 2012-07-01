@@ -1,7 +1,7 @@
 <?php
 // domain search example.
-error_reporting(E_ALL);
-$domain="opennic.oz";
+$tld="sci";
+$domain="opennic";
 $user="TEST01";
 $userkey="1234567890abcdef";
 $name="John Smith";
@@ -9,12 +9,12 @@ $email="john@smith.com";
 $ns1="ns1.fancydns.net";
 $ns2="ns2.fancydns.net";
 
-$name=urlencode($name);
-$email=urlencode($email);
+$name=rawurlencode($name);
+$email=rawurlencode($email);
 
-$URL="http://127.0.0.1/rm_api.cgi?cmd=register&user=".$user."&userkey=".$userkey."&domain=".$domain."&name=".$name."&email=".$email."&ns1=".$ns1."&ns2=".$ns2."";
+$URL="http://127.0.0.1/rm_api.cgi?cmd=register&user=".$user."&userkey=".$userkey."&tld=".$tld."&domain=".$domain."&name=".$name."&email=".$email."&ns1=".$ns1."&ns2=".$ns2;
 $handle=fopen($URL, "r");
-$ret_data=fread($handle, 10);
+$ret_data=fread($handle, 1024);
 fclose($handle);
 switch($ret_data)
 {
@@ -28,7 +28,7 @@ switch($ret_data)
 		echo "Server error occured.";
 		break;
 	default:
-		echo "An unknown problem as occured. Please try again later.";
+		echo "An unknown problem has occured. Please try again later.";
 		break;
 }
 ?>
