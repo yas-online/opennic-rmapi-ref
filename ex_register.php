@@ -1,7 +1,7 @@
 <?php
 // domain search example.
-$tld="sci";
-$domain="opennic";
+$tld="oz";
+$domain="example";
 $user="TEST01";
 $userkey="1234567890abcdef";
 $name="John Smith";
@@ -12,6 +12,7 @@ $ns2="ns2.fancydns.net";
 $name=rawurlencode($name);
 $email=rawurlencode($email);
 
+// change this to the TLD manager server
 $URL="http://127.0.0.1/rm_api.cgi?cmd=register&user=".$user."&userkey=".$userkey."&tld=".$tld."&domain=".$domain."&name=".$name."&email=".$email."&ns1=".$ns1."&ns2=".$ns2;
 $handle=fopen($URL, "r");
 $ret_data=fread($handle, 1024);

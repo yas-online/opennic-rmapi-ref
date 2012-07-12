@@ -1,10 +1,11 @@
 <?php
 // domain search example.
-$tld="sci";
-$domain="opennic";
+$tld="oz";
+$domain="example";
 $user="TEST01";
 $userkey="1234567890abcdef";
 
+// change this to the TLD manager server
 $URL="http://127.0.0.1/rm_api.cgi?cmd=check&user=".$user."&userkey=".$userkey."&tld=".$tld."&domain=".$domain;
 $handle=fopen($URL, "r");
 $ret_data=fread($handle, 1024);

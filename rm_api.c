@@ -34,6 +34,9 @@
 	- Changed database name
 	- Changed to GPL v3 license.
 	- Transfer, delete and assist temporarily disabled.
+	
+	Version v0.51 - 2012-07-12
+	- After a short break, tidied up a little bit.
 */
 #include <stdio.h>
 #include <time.h>
@@ -60,7 +63,46 @@ void notify(int result)
 
 int verify(char user[10], char key[16])
 {
-	return 1;
+	char sql_str[1024];
+	int result=0;
+	char res_user[10];
+	char res_userkey[16];
+
+	sprintf(sql_str, "SELECT r_userid FROM registrars WHERE r_user='%s' AND r_userkey='%s' LIMIT 1", user, key);
+	rc = sqlite3_open(db_file, &db);
+	if(rc)
+	{
+		printf("Can't open package database.");
+		sqlite3_close(db);
+		return 255;
+	}
+	rc = sqlite3_prepare_v2(db, sql_str, 1024, &res, 0);
+	if(rc != SQLITE_OK)
+	{
+		printf("The package database file is corrupt!");
+		sqlite3_free(zErrMsg);
+		sqlite3_close(db);
+		return 255;
+	}
+	while(1)
+	{
+		result=sqlite3_step(res);
+		if(result==SQLITE_ROW)
+		{
+			sprintf(res_user, "%s", sqlite3_column_text(res, 0));
+			sprintf(res_userkey, "%s", sqlite3_column_text(res, 1));
+		} else {
+			break;
+		}
+	}
+	sqlite3_finalize(res);
+	sqlite3_close(db);
+	if(!strcmp(res_user, user))
+	{
+		return 1;
+	} else {
+		return 0;
+	}
 }
 
 int domain_exists(char tld[5], char domain[50])
@@ -143,6 +185,7 @@ int delete_domain(char tld[5], char domain[50], char name[20], char email[50])
 
 int register_domain(char tld[5], char domain[50], char name[20], char email[50], char ns1[50], char ns2[50])
 {
+	FILE *fp;
 	char sql_str[1024];
 	int result=0;
 	char updated[11];
@@ -182,6 +225,9 @@ int register_domain(char tld[5], char domain[50], char name[20], char email[50],
 	sqlite3_finalize(res);
 	sqlite3_close(db);
 	sql_str[0]='\0';
+	fp=fopen("/tmp/inittld.flag", "r");
+	fprintf(fp, "1");
+	fclose(fp);
 	return 1;
 }
 
