@@ -1,6 +1,8 @@
 OpenNIC Remote Management Application Programming Interface - Reference Implementation.
 By Martin COLEMAN.
 
+WORK-IN-PROGRESS, do not download yet.
+
 Released under the GPLv3.
 
 This is not (yet) officially related to the OpenNIC Project in any way. This is an implementation of the RMAPI specification that will get added to as new ideas are proposed and explored for the API. Others may implement their own according to the specifications, this is just mine.

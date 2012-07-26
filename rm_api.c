@@ -26,6 +26,9 @@
 	- Code fixes
 	- Example code now supplied (register, check)
 	
+	Version v0.3 - 2012-07-??
+	- Added registrar verification.
+	
 	Version v0.5 - 2012-07-01
 	- Embeds SQLite3
 	- Improved handling of TLD
@@ -42,7 +45,6 @@
 #include <time.h>
 #include "sqlite3.c"
 #include "cgi.h"
-#define DEBUG
 
 /* for SQLite3 */
 sqlite3 *db;
@@ -52,7 +54,7 @@ int rc;
 
 /* for cgilib */
 s_cgi *cgi;
-char db_file[15]="opennic_man.sq3";
+char db_file[30]="opennic_man.sq3";
 
 void notify(int result)
 {
@@ -61,36 +63,92 @@ void notify(int result)
 	printf("%d", result);
 }
 
-int verify(char user[10], char key[16])
+int get_registrar_id(char user[10], char key[16])
 {
+	/*
 	char sql_str[1024];
 	int result=0;
 	char res_user[10];
 	char res_userkey[16];
+	char res_userid[10];
+	int num_userid=0;
 
 	sprintf(sql_str, "SELECT r_userid FROM registrars WHERE r_user='%s' AND r_userkey='%s' LIMIT 1", user, key);
 	rc = sqlite3_open(db_file, &db);
 	if(rc)
 	{
-		printf("Can't open package database.");
+		fprintf(stderr, "Can't open package database.");
 		sqlite3_close(db);
-		return 255;
+		return 0;
 	}
 	rc = sqlite3_prepare_v2(db, sql_str, 1024, &res, 0);
 	if(rc != SQLITE_OK)
 	{
-		printf("The package database file is corrupt!");
+		fprintf(stderr, "The package database file is corrupt!");
 		sqlite3_free(zErrMsg);
 		sqlite3_close(db);
-		return 255;
+		return 0;
 	}
 	while(1)
 	{
 		result=sqlite3_step(res);
 		if(result==SQLITE_ROW)
 		{
-			sprintf(res_user, "%s", sqlite3_column_text(res, 0));
-			sprintf(res_userkey, "%s", sqlite3_column_text(res, 1));
+			sprintf(res_userid, "%s", sqlite3_column_text(res, 0));
+			sprintf(res_user, "%s", sqlite3_column_text(res, 1));
+			sprintf(res_userkey, "%s", sqlite3_column_text(res, 2));
+		} else {
+			break;
+		}
+	}
+	sqlite3_finalize(res);
+	sqlite3_close(db);
+	num_userid=atoi(res_userid);
+	//num_userid=res_userid-'0';
+	//sscanf(res_userid, "%d", &num_userid);
+	if(!strcmp(res_user, user))
+	{
+		return num_userid;
+	} else {
+		return 0;
+	}
+	*/
+	return 1;
+}
+
+int verify(char user[10], char key[16])
+{
+	/*
+	char sql_str[1024];
+	int result=0;
+	char res_user[10];
+	char res_userkey[16];
+	char res_userid[10];
+
+	sprintf(sql_str, "SELECT r_userid FROM registrars WHERE r_user='%s' AND r_userkey='%s' LIMIT 1", user, key);
+	rc = sqlite3_open(db_file, &db);
+	if(rc)
+	{
+		fprintf(stderr, "Can't open package database.");
+		sqlite3_close(db);
+		return 0;
+	}
+	rc = sqlite3_prepare_v2(db, sql_str, 1024, &res, 0);
+	if(rc != SQLITE_OK)
+	{
+		fprintf(stderr, "The package database file is corrupt!");
+		sqlite3_free(zErrMsg);
+		sqlite3_close(db);
+		return 0;
+	}
+	while(1)
+	{
+		result=sqlite3_step(res);
+		if(result==SQLITE_ROW)
+		{
+			sprintf(res_userid, "%s", sqlite3_column_text(res, 0));
+			sprintf(res_user, "%s", sqlite3_column_text(res, 1));
+			sprintf(res_userkey, "%s", sqlite3_column_text(res, 2));
 		} else {
 			break;
 		}
@@ -103,6 +161,8 @@ int verify(char user[10], char key[16])
 	} else {
 		return 0;
 	}
+	*/
+	return 1;
 }
 
 int domain_exists(char tld[5], char domain[50])
@@ -183,7 +243,7 @@ int delete_domain(char tld[5], char domain[50], char name[20], char email[50])
 	return 1;
 }
 
-int register_domain(char tld[5], char domain[50], char name[20], char email[50], char ns1[50], char ns2[50])
+int register_domain(char tld[5], char domain[50], char name[20], char email[50], char ns1[50], char ns2[50], int registrarid)
 {
 	FILE *fp;
 	char sql_str[1024];
@@ -191,14 +251,16 @@ int register_domain(char tld[5], char domain[50], char name[20], char email[50],
 	char updated[11];
 	time_t t;
 	struct tm* tm;
+	sql_str[0]='\0';
 
 	time(&t);
 	tm = localtime(&t);
 	strftime(updated, sizeof updated, "%Y-%m-%d", tm);
 
 	//sql_str=sqlite3_mprintf("INSERT INTO domains (domain, name, email, ns1, ns2) VALUES('%s', '%s', '%s', '%s', '%s')", domain, name, email, ns1, ns2);
-	sprintf(sql_str, "INSERT INTO %s_domains (domain, name, email, ns1, ns2, registered, expires, updated, userid) VALUES('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', 1)", tld, domain, name, email, ns1, ns2, updated, updated, updated);
+	sprintf(sql_str, "INSERT INTO %s_domains (domain, name, email, ns1, ns2, registered, expires, updated, userid) VALUES('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', %d)", tld, domain, name, email, ns1, ns2, updated, updated, updated, registrarid);
 	rc = sqlite3_open(db_file, &db);
+	printf("%s", sql_str);
 	if(rc)
 	{
 		//printf("Can't open package database.");
@@ -208,7 +270,7 @@ int register_domain(char tld[5], char domain[50], char name[20], char email[50],
 	rc = sqlite3_prepare_v2(db, sql_str, -1, &res, 0);
 	if(rc != SQLITE_OK)
 	{
-		//printf("DB Error: %s\n", sqlite3_errmsg(db));
+		fprintf(stderr, "DB Error: %s\n", sqlite3_errmsg(db));
 		sqlite3_free(zErrMsg);
 		sqlite3_close(db);
 		return 0;
@@ -225,7 +287,7 @@ int register_domain(char tld[5], char domain[50], char name[20], char email[50],
 	sqlite3_finalize(res);
 	sqlite3_close(db);
 	sql_str[0]='\0';
-	fp=fopen("/tmp/inittld.flag", "r");
+	fp=fopen("/tmp/inittld.flag", "w");
 	fprintf(fp, "1");
 	fclose(fp);
 	return 1;
@@ -297,6 +359,7 @@ int main(void)
 	char *olduser;
 	char *olduserkey;
 	int rc=0;
+	int registrarid=0;
 	//cgiDebug(2, 1);
 	cgi = cgiInit();
 
@@ -313,12 +376,13 @@ int main(void)
 				rc=domain_exists(tld, domain);
 				notify(rc);
 			} else {
-				notify(255);
+				notify(25);
 			}
 			return 0;
 		}
 		else if(!strcmp(cmd, "register"))
 		{
+			printf("Content-type: text/html\n\n");
 			user=cgiGetValue(cgi, "user");
 			userkey=cgiGetValue(cgi, "userkey");
 			tld=cgiGetValue(cgi, "tld");
@@ -327,10 +391,11 @@ int main(void)
 			email=cgiGetValue(cgi, "email");
 			ns1=cgiGetValue(cgi, "ns1");
 			ns2=cgiGetValue(cgi, "ns2");
-			/* verify user and key */
+			/* verify registrar user and key */
 			if(verify(user, userkey))
 			{
-				rc=register_domain(tld, domain, name, email, ns1, ns2);
+				registrarid=get_registrar_id(user, userkey);
+				rc=register_domain(tld, domain, name, email, ns1, ns2, registrarid);
 				notify(rc);
 			} else {
 				notify(255);
