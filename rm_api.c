@@ -26,7 +26,7 @@
 	- Code fixes
 	- Example code now supplied (register, check)
 	
-	Version v0.3 - 2012-07-??
+	Version v0.3 - 2012-06-??
 	- Added registrar verification.
 	
 	Version v0.5 - 2012-07-01
@@ -65,7 +65,6 @@ void notify(int result)
 
 int get_registrar_id(char user[10], char key[16])
 {
-	/*
 	char sql_str[1024];
 	int result=0;
 	char res_user[10];
@@ -112,13 +111,11 @@ int get_registrar_id(char user[10], char key[16])
 	} else {
 		return 0;
 	}
-	*/
 	return 1;
 }
 
 int verify(char user[10], char key[16])
 {
-	/*
 	char sql_str[1024];
 	int result=0;
 	char res_user[10];
@@ -161,7 +158,6 @@ int verify(char user[10], char key[16])
 	} else {
 		return 0;
 	}
-	*/
 	return 1;
 }
 

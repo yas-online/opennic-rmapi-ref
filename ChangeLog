@@ -1,3 +1,6 @@
+Version v0.51 - 2012-07-12
+- After a short break, tidied up a little bit.
+
 Version v0.5 - 2012-07-01
 - Embeds SQLite3
 - Improved handling of TLD
@@ -7,5 +10,12 @@ Version v0.5 - 2012-07-01
 - Changed to GPL v3 license.
 - Transfer, delete and assist temporarily disabled.
 
+Version v0.3 - 2012-06-??
+- Added registrar verification.
+	
+Update 2012-06-14
+- Code fixes
+- Example code now supplied (register, check)
+	
 v0.01 2012-06-10 - MC
 - Just some toy code. A lot of TODO, with two practical commands demonstrated: check, and record.
