@@ -30,4 +30,5 @@ r_contact VARCHAR(20) NOT NULL,
 r_email VARCHAR(50) NOT NULL,
 r_url VARCHAR(50) NOT NULL);
 
-INSERT INTO registrars (r_user, r_userkey, r_name, r_contact, r_email, r_url) VALUES('TLDMAN', '1234567890abcdef', 'TLD Manager', 'Your Name', 'Your Email', 'http://yoursite.TLD');
+INSERT INTO registrars (r_user, r_userkey, r_name, r_contact, r_email, r_url) VALUES('OZTLD', '1234567890abcdef', 'TLD Manager', 'Martin C', 'hostmaster@opennic.oz', 'http://opennic.oz');
+INSERT INTO oz_domains(domain, name, email, ns1, ns2, registered, updated, userid) VALUES('opennic', 'Martin C', 'martin@opennic.oz', 'ns1.opennic.oz', 'ns2.opennic.oz', '2012-08-30', '2012-08-30', 0);
