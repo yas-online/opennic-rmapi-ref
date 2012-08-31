@@ -3,7 +3,7 @@
 	For the OpenNIC Project.
 	Copyright (C) 2012 Martin COLEMAN (C) 2012.
 	Web: www.mchomenet.info or www.mchomenet.oz
-	
+
 	This program is free software; you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
 	the Free Software Foundation; either version 3 of the License, or
@@ -20,15 +20,15 @@
 	------------
 	All test code. Do not use unless you know what you are doing!!
 	------------
-	CMDS: check, register, update, transfer, delete, assist
-	
+	CMDS: check, register, update, backup (whois), transfer, delete, assist
+
 	Update 2012-06-14
 	- Code fixes
 	- Example code now supplied (register, check)
-	
+
 	Version v0.3 - 2012-06-??
 	- Added registrar verification.
-	
+
 	Version v0.5 - 2012-07-01
 	- Embeds SQLite3
 	- Improved handling of TLD
@@ -37,10 +37,10 @@
 	- Changed database name
 	- Changed to GPL v3 license.
 	- Transfer, delete and assist temporarily disabled.
-	
+
 	Version v0.51 - 2012-07-12
 	- After a short break, tidied up a little bit.
-    
+
     Version v0.60 - 2012-08-30
     - Implemented a "backup" command.
     - Fixed some string handling.
@@ -52,20 +52,6 @@
 #include <time.h>
 #include "sqlite3.c"
 #include "cgi.h"
-
-struct {
-	char dr_domain[51];
-	char dr_registered[11];
-	char expires[11];
-	char updated[11];
-	char dr_name[20];
-	char dr_email[50];
-	char ns1[30];
-	char ns2[30];
-	char ns1_ip[16];
-	char ns2_ip[16];
-	int status;
-} DOMAINRECORD;
 
 /* for SQLite3 */
 sqlite3 *db;
@@ -86,9 +72,9 @@ void chomp(char *s)
 
 void notify(int result)
 {
-	cgiFree(cgi);
-	printf("Content-type: text/html\n\n");
+	printf("Content-type: text/html\r\n\r\n");
 	printf("%d", result);
+	cgiFree(cgi);
 }
 
 int get_registrar_id(char user[10], char key[16])
@@ -366,13 +352,27 @@ int update_domain(char tld[5], char domain[50], char name[20], char email[50], c
 
 int backup_domain(char tld[5], char domain[50])
 {
-    char whois_db[16];
+	char dr_domain[51];
+	char dr_registered[11];
+	char expires[11];
+	char updated[11];
+	char dr_name[20];
+	char dr_email[50];
+	char ns1[30];
+	char ns2[30];
+	char ns1_ip[16];
+	char ns2_ip[16];
+	int status;
     char sql_str[1024];
 	int result=0;
-    whois_db[0]='\0';
 
 	chomp(domain);
-    /*sprintf(whois_db, "%s_tld.sq3", tld);*/
+	sprintf(sql_str, "SELECT domain, registered, name, email, ns1, ns2 FROM %s_domains WHERE domain='%s' LIMIT 1", tld, domain);
+
+	#ifdef DEBUG
+	printf("Query [%s]\n", sql_str);
+	#endif
+
 	rc = sqlite3_open(db_file, &db);
 	if(rc)
 	{
@@ -380,12 +380,6 @@ int backup_domain(char tld[5], char domain[50])
 		sqlite3_close(db);
 		return 0;
 	}
-	sprintf(sql_str, "SELECT domain, registered, name, email, ns1, ns2, expires, updated FROM %s_domains WHERE domain='%s' LIMIT 1", tld, domain);
-
-	#ifdef DEBUG
-	printf("Query [%s]\n", sql_str);
-	#endif
-
 	rc = sqlite3_prepare_v2(db, sql_str, 1024, &res, 0);
 	if(rc != SQLITE_OK)
 	{
@@ -399,22 +393,24 @@ int backup_domain(char tld[5], char domain[50])
 		result=sqlite3_step(res);
 		if(result==SQLITE_ROW)
 		{
-			sprintf(DOMAINRECORD.dr_domain, "%s", sqlite3_column_text(res, 0));
-			sprintf(DOMAINRECORD.dr_registered, "%s", sqlite3_column_text(res, 1));
-			sprintf(DOMAINRECORD.dr_name, "%s", sqlite3_column_text(res, 2));
-			sprintf(DOMAINRECORD.dr_email, "%s", sqlite3_column_text(res, 3));
-			sprintf(DOMAINRECORD.ns1, "%s", sqlite3_column_text(res, 4));
-			sprintf(DOMAINRECORD.ns2, "%s", sqlite3_column_text(res, 5));
-			sprintf(DOMAINRECORD.expires, "%s", sqlite3_column_text(res, 6));
-			sprintf(DOMAINRECORD.updated, "%s", sqlite3_column_text(res, 7));
+			sprintf(dr_domain, "%s", sqlite3_column_text(res, 0));
+			sprintf(dr_registered, "%s", sqlite3_column_text(res, 1));
+			sprintf(dr_name, "%s", sqlite3_column_text(res, 2));
+			sprintf(dr_email, "%s", sqlite3_column_text(res, 3));
+			sprintf(ns1, "%s", sqlite3_column_text(res, 4));
+			sprintf(ns2, "%s", sqlite3_column_text(res, 5));
+			/*sprintf(expires, "%s", sqlite3_column_text(res, 6));
+			sprintf(updated, "%s", sqlite3_column_text(res, 7));*/
 		} else {
 			break;
 		}
 	}
 	sqlite3_finalize(res);
 	sqlite3_close(db);
-	printf("OpenNIC,Domain:%s.%s,Registered:%s,Updated:%s,Status:Active,Name:%s,Email:%s,NS1:%s,NS2:%s,URL:www.opennic.%s,Finish", DOMAINRECORD.dr_domain, tld, DOMAINRECORD.dr_registered, DOMAINRECORD.updated, DOMAINRECORD.dr_name, DOMAINRECORD.dr_email, DOMAINRECORD.ns1, DOMAINRECORD.ns2, tld);
-	/* printf("Welcome to the OpenNIC Registry!\r\nThe domain details are:\r\nDomain: %s.%s\r\nDomain Registered: %s\r\nDomain Updated: %s\r\nDomain Status: Active\r\nRegistrant Name: %s\r\nRegistrant Email: %s\r\nNS1: %s\r\nNS2: %s\r\nRegistrar URL: www.opennic.%s\r\n", DOMAINRECORD.dr_domain, tld, DOMAINRECORD.dr_registered, DOMAINRECORD.updated, DOMAINRECORD.dr_name, DOMAINRECORD.dr_email, DOMAINRECORD.ns1, DOMAINRECORD.ns2, tld); */
+    printf("Content-type: text/html\r\n\r\n");
+	printf("OpenNIC,Domain:%s.%s,Registered:%s,Status:Active,Name:%s,Email:%s,NS1:%s,NS2:%s,URL:www.opennic.%s,Finish", dr_domain, tld, dr_registered, dr_name, dr_email, ns1, ns2, tld);
+	/* for debugging only
+    printf("Welcome to the OpenNIC Registry!\r\nThe domain details are:\r\nDomain: %s.%s\r\nDomain Registered: %s\r\nDomain Updated: %s\r\nDomain Status: Active\r\nRegistrant Name: %s\r\nRegistrant Email: %s\r\nNS1: %s\r\nNS2: %s\r\nRegistrar URL: www.opennic.%s\r\n", DOMAINRECORD.dr_domain, tld, DOMAINRECORD.dr_registered, DOMAINRECORD.updated, DOMAINRECORD.dr_name, DOMAINRECORD.dr_email, DOMAINRECORD.ns1, DOMAINRECORD.ns2, tld); */
     cgiFree(cgi);
 	return 1;
 }
@@ -461,7 +457,7 @@ int main(void)
 		}
 		else if(!strcmp(cmd, "register"))
 		{
-			printf("Content-type: text/html\n\n");
+			printf("Content-type: text/html\r\n\r\n");
 			user=cgiGetValue(cgi, "user");
 			userkey=cgiGetValue(cgi, "userkey");
 			tld=cgiGetValue(cgi, "tld");
@@ -509,11 +505,16 @@ int main(void)
 			if(verify(user, userkey))
 			{
 				backup_domain(tld, domain);
-                notify(1);
 			} else {
 				notify(255);
 			}
 			return 0;
+        }
+        else if(!strcmp(cmd, "test"))
+        {
+            printf("Content-type: text/html\r\n\r\n");
+            printf("CGI is working well so far!\n");
+            return 0;
         }
 		/* TODO
 		else if(!strcmp(cmd, "transfer"))
