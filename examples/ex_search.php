@@ -2,7 +2,7 @@
 // domain search example.
 $tld="oz";
 $domain="example";
-$user="TEST01";
+$user="OZTLD";
 $userkey="1234567890abcdef";
 
 // change this to the TLD manager server

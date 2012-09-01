@@ -1,8 +1,9 @@
 <?php
+error_reporting(E_ALL);
 // domain search example.
 $tld="oz";
 $domain="example";
-$user="TEST01";
+$user="OZTLD";
 $userkey="1234567890abcdef";
 $name="John Smith";
 $email="john@smith.com";
@@ -32,4 +33,7 @@ switch($ret_data)
 		echo "An unknown problem has occured. Please try again later.";
 		break;
 }
+echo "<h2>Debug</h2>";
+echo $URL."-";
+echo "[".$ret_data."]";
 ?>
