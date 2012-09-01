@@ -516,7 +516,26 @@ int main(void)
             printf("CGI is working well so far!\n");
             return 0;
         }
-		/* TODO
+		/* TODO */
+        /*
+		else if(!strcmp(cmd, "delete"))
+		{
+			user=cgiGetValue(cgi, "user");
+			userkey=cgiGetValue(cgi, "userkey");
+			tld=cgiGetValue(cgi, "tld");
+			domain=cgiGetValue(cgi, "domain");
+			name=cgiGetValue(cgi, "name");
+			if(verify(user, userkey))
+			{
+				rc=delete_domain(tld, domain, name, email);
+				notify(rc);
+			} else {
+				notify(255);
+			}
+			return 0;
+		}
+        */
+        /*
 		else if(!strcmp(cmd, "transfer"))
 		{
 			user=cgiGetValue(cgi, "user");
@@ -528,24 +547,6 @@ int main(void)
 			if(verify(user, userkey))
 			{
 				rc=transfer_domain(user, userkey, olduser, olduserkey, tld, domain);
-				notify(rc);
-			} else {
-				notify(255);
-			}
-			return 0;
-		}
-		*/
-		/*
-		else if(!strcmp(cmd, "delete"))
-		{
-			user=cgiGetValue(cgi, "user");
-			userkey=cgiGetValue(cgi, "userkey");
-			tld=cgiGetValue(cgi, "tld");
-			domain=cgiGetValue(cgi, "domain");
-			name=cgiGetValue(cgi, "name");
-			if(verify(user, userkey))
-			{
-				rc=delete_domain(tld, domain, name, email);
 				notify(rc);
 			} else {
 				notify(255);

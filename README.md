@@ -1,7 +1,7 @@
 OpenNIC Remote Management Application Programming Interface - Reference Implementation.
 By Martin COLEMAN.
 
-WORK-IN-PROGRESS, do not use unless you know what you are doing. Currently segfaults if compiled using GCC, but not with TCC. I'm trying to figure out why.
+WORK-IN-PROGRESS, do not use unless you know what you are doing.
 
 Released under the GPLv3.
 
