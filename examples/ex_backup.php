@@ -1,6 +1,5 @@
 <?php
-error_reporting(E_ALL);
-// domain search example.
+// domain backup example.
 $tld="oz";
 $domain="opennic";
 $user="OZTLD";

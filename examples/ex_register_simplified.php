@@ -1,5 +1,5 @@
 <?php
-// domain register example.
+// simplified domain register example.
 $tld="oz";
 $domain="example";
 $user="OZTLD";
@@ -13,8 +13,23 @@ $name=rawurlencode($name);
 $email=rawurlencode($email);
 
 // change this to the TLD manager server
-$URL="http://127.0.0.1/rm_api.cgi?cmd=register&user=".$user."&userkey=".$userkey."&tld=".$tld."&domain=".$domain."&name=".$name."&email=".$email."&ns1=".$ns1."&ns2=".$ns2;
-$handle=fopen($URL, "r");
+$URL="http://127.0.0.1/rm_api.cgi?";
+
+/* requestParams and requestURL thanks to David M. ! */
+$requestParams = array(
+    'cmd' => 'register',
+    'user' => $user,
+    'userkey' => $userkey,
+    'tld' => $tld,
+    'domain' => $domain,
+    'name' => $name,
+    'email' => $email,
+    'ns1' => $ns1,
+    'ns2' => $ns2);
+
+$requestUrl = $url . http_build_query($requestParams);
+
+$handle=fopen($requestURL, "r"); /* changed from $URL to improved URL handling */
 $ret_data=fread($handle, 1024);
 fclose($handle);
 switch($ret_data)
