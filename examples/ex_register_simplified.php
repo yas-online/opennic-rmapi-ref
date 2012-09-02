@@ -29,7 +29,7 @@ $requestParams = array(
 
 $requestUrl = $url . http_build_query($requestParams);
 
-$handle=fopen($requestURL, "r"); /* changed from $URL to improved URL handling */
+$handle=fopen($requestUrl, "r"); /* changed from $URL to improved URL handling */
 $ret_data=fread($handle, 1024);
 fclose($handle);
 switch($ret_data)
