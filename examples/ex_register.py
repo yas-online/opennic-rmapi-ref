@@ -21,7 +21,7 @@ requestData = {
     "ns1": "ns1.fancydns.net",
     "ns2": "ns2.fancydns.net"}
 
-apiResponse = request(url = apiUrl, command = 'register', requestData);
+apiResponse = request(url = apiUrl, command = 'register', data = requestData);
 
 if apiResponse:
     print apiResponse
